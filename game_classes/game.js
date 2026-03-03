@@ -44,9 +44,16 @@ class Game {
         this.spawnPipes();
 
         // create player
-        this.bird = new Bird()
-        this.bird.init(this.canvas, this.width - 80, this.height - 250)
-        this.birds.push(this.bird)
+        // this.bird = new Bird()
+        // this.bird.init(this.canvas, this.width - 80, this.height - 250)
+        // this.birds.push(this.bird)
+
+        // create multiple birds
+        for (var i = 0; i < 10; i++) {
+            var bird = new Bird()
+            bird.init(this.canvas, this.width - 80, this.height - 250 - (i * 20))
+            this.birds.push(bird)
+        }
     }
 
     update() {
@@ -70,6 +77,8 @@ class Game {
         this.birds.forEach(bird => {
             bird.update();
         });
+
+        this.birds = this.birds.filter(bird => !bird.isDead(this.height, this.pipes));
 
 
 
@@ -130,6 +139,15 @@ class Game {
             this.ctx.drawImage(images.bird, -bird.width / 2, -bird.height / 2, bird.width, bird.height);
             this.ctx.restore();
         }
+
+
+        this.ctx.fillStyle = "white";
+        this.ctx.font = "20px Oswald, sans-serif";
+        this.ctx.fillText("Score : " + this.score, 10, 25);
+        this.ctx.fillText("Max Score : " + this.maxScore, 10, 50);
+        this.ctx.fillText("Generation : " + this.generation, 10, 75);
+        // this.ctx.fillText("Alive : " + this.alives + " / " + Neuvol.options.population, 10, 100);
+
 
 
         requestAnimationFrame(() => this.display());

@@ -34,6 +34,22 @@ class Bird {
         this.gravity += this.velocity;
         this.y += this.gravity;
     }
+    isDead(height, pipes) {
+        if (this.y >= height || this.y + this.height <= 0) {
+            return true;
+        }
+        for (var i in pipes) {
+            if (!(
+                this.x > pipes[i].x + pipes[i].width ||
+                this.x + this.width < pipes[i].x ||
+                this.y > pipes[i].y + pipes[i].height ||
+                this.y + this.height < pipes[i].y
+            )) {
+                return true;
+            }
+        }
+        return false;
+    }
     display() {
 
     }
