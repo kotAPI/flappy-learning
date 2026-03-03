@@ -20,13 +20,21 @@ class Game {
         this.backgroundSpeed = 0.5;
         this.backgroundX = 0;
         this.maxScore = 0;
+        this.running = false;
+        this.updateTimer = null;
     }
 
     start() {
+        if (this.updateTimer !== null) {
+            clearTimeout(this.updateTimer);
+            this.updateTimer = null;
+        }
+
         this.interval = 0;
         this.score = 0;
         this.pipes = [];
         this.birds = [];
+        this.running = true;
         // this.ctx.fillStyle = "black";
         // this.ctx.fillRect(0, 0, this.width, this.height);
         this.ctx.drawImage(images.background, 0, 0);
@@ -57,12 +65,20 @@ class Game {
     }
 
     update() {
-        this.backgroundX += this.backgroundSpeed; // ← THIS is the movement
+        if (!this.running) {
+            return;
+        }
 
+        if (this.isItEnd()) {
+            this.restart();
+            return;
+        }
 
-        this.interval++
-        this.score++
-        this.maxScore = Math.max(this.maxScore, this.score)
+        this.backgroundX += this.backgroundSpeed;
+        this.interval++;
+        this.score++;
+        this.maxScore = Math.max(this.maxScore, this.score);
+
         if (this.interval == this.spawnInterval) {
             this.interval = 0;
             this.spawnPipes();
@@ -80,15 +96,24 @@ class Game {
 
         this.birds = this.birds.filter(bird => !bird.isDead(this.height, this.pipes));
 
-
-
-        // make it call update again
-        if (this.FPS == 0) {
-            setZeroTimeout(() => this.update());
-        } else {
-            setTimeout(() => this.update(), 1000 / this.FPS);
+        if (this.isItEnd()) {
+            this.restart();
+            return; // Exit immediately if the last bird just died this frame
         }
 
+        if (this.FPS == 0) {
+            requestAnimationFrame(() => this.update());
+        } else {
+            this.updateTimer = setTimeout(() => this.update(), 1000 / this.FPS);
+        }
+    }
+    restart() {
+        this.start();
+        if (this.FPS == 0) {
+            requestAnimationFrame(() => this.update());
+        } else {
+            this.updateTimer = setTimeout(() => this.update(), 1000 / this.FPS);
+        }
     }
     spawnPipes() {
         var deltaBord = 50;
@@ -102,7 +127,7 @@ class Game {
         this.pipes.push(pipe2);
     }
     isItEnd() {
-
+        return this.birds.length === 0;
     }
     display() {
         // TODO
@@ -149,6 +174,16 @@ class Game {
         // this.ctx.fillText("Alive : " + this.alives + " / " + Neuvol.options.population, 10, 100);
 
 
+
+        if (this.isItEnd()) {
+            this.ctx.fillStyle = "rgba(0,0,0,0.5)";
+            this.ctx.fillRect(0, 0, this.width, this.height);
+            this.ctx.fillStyle = "white";
+            this.ctx.font = "40px Oswald, sans-serif";
+            this.ctx.textAlign = "center";
+            this.ctx.fillText("PAUSED", this.width / 2, this.height / 2);
+            this.ctx.textAlign = "left"; // Reset for other text
+        }
 
         requestAnimationFrame(() => this.display());
 
