@@ -5,6 +5,7 @@ class Game {
         this.ctx = this.canvas.getContext("2d")
         this.width = this.canvas.width;
         this.height = this.canvas.height;
+        this.FPS = 60;
 
         // game stuff
         this.pipes = []
@@ -16,7 +17,7 @@ class Game {
         this.gen = []
         this.alives = 0;
         this.generation = 0;
-        this.backgroundSpeed = 0.1;
+        this.backgroundSpeed = 0.5;
         this.backgroundX = 0;
         this.maxScore = 0;
     }
@@ -40,12 +41,40 @@ class Game {
     }
 
     update() {
+        this.backgroundX += this.backgroundSpeed; // ← THIS is the movement
+
+        // make it call update again
+        if (this.FPS == 0) {
+            setZeroTimeout(() => this.update());
+        } else {
+            setTimeout(() => this.update(), 1000 / this.FPS);
+        }
 
     }
     isItEnd() {
 
     }
     display() {
+        // TODO
+        const bg = images.background;
+        const w = bg.width;
+
+
+        const x = -Math.floor(this.backgroundX % w);
+
+        this.ctx.clearRect(0, 0, this.width, this.height);
+
+
+        // background position updates
+        for (var i = 0; i < Math.ceil(this.width / images.background.width) + 1; i++) {
+            this.ctx.drawImage(
+                images.background,
+                i * images.background.width - Math.floor(this.backgroundX % images.background.width),
+                0
+            );
+        }
+
+        requestAnimationFrame(() => this.display());
 
     }
 

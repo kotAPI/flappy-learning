@@ -1,5 +1,5 @@
 var game = undefined;
-let FPS = 60;
+
 let maxScore = 0;
 let images = {}
 
@@ -33,6 +33,8 @@ const startGame = () => {
     console.log("Game started")
     game = new Game()
     game.start()
+    game.update()
+    game.display()
     console.log(game)
 }
 
